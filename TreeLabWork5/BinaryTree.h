@@ -78,24 +78,11 @@ protected:
 		}
 		else
 		{
+			if (change != nullptr)
+			{
+				change->SetParent(nullptr);
+			}
 			_root = change;
-		}
-
-		if (current->GetLeft() != nullptr)
-		{
-			current->GetLeft()->SetParent(change);
-		}
-
-		if (current->GetRight() != nullptr)
-		{
-			current->GetRight()->SetParent(change);
-		}
-
-		if (change != nullptr)
-		{
-			change->SetParent(parent);
-			change->SetRight(current->GetRight());
-			change->SetLeft(current->GetLeft());
 		}
 
 		return parent;
@@ -318,24 +305,30 @@ public:
 	void Remove(T item)
 	{
 		TreeSegment<T>* pointer = FindSegment(item);
-		TreeSegment<T>* parent = pointer->GetParent();
 		if (pointer->GetRight() == nullptr && pointer->GetLeft() == nullptr)
 		{
 			RemoveSegment(pointer, nullptr);
 		}
 		else if (pointer->GetRight() != nullptr && pointer->GetLeft() == nullptr)
 		{
+			pointer->GetRight()->SetParent(pointer->GetParent());
 			RemoveSegment(pointer, pointer->GetRight());
 		}
 		else if (pointer->GetLeft() != nullptr && pointer->GetRight() == nullptr)
 		{
+			pointer->GetLeft()->SetParent(pointer->GetParent());
 			RemoveSegment(pointer, pointer->GetLeft());
 		}
 		else
 		{
 			TreeSegment<T>* minPointer = FindMinSegment(pointer->GetRight());
-			ReplaceSegment(minPointer, nullptr);
-			RemoveSegment(pointer, minPointer);
+			T item = minPointer->GetItem();
+			if (minPointer->GetRight() != nullptr)
+			{
+				minPointer->GetRight()->SetParent(minPointer->GetParent());
+			}
+			RemoveSegment(minPointer, minPointer->GetRight());
+			pointer->SetItem(item);
 		}
 	}
 
